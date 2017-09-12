@@ -1,0 +1,73 @@
+%\title{Creating an index with the makeidx package}
+% Example from http://www.dickimaw-books.com/latex/thesis/html/makeidx.html
+
+\documentclass[12pt,oneside]{scrbook} 
+
+\usepackage{makeidx} 
+\usepackage{minted}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\selectlanguage{french}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\definecolor{bg_js}{rgb}{0.95,0.55,0.55}
+\newminted{typescript}{javascript,bgcolor=bg}
+
+\makeindex 
+
+\title{Electron} 
+\author{Me}
+\date{\today}
+
+\begin{document} 
+\maketitle 
+\tableofcontents
+
+
+%\includegraphics{util_inherits.png}
+
+%%%%%%%%%%%%%%NPM/Node
+\chapter{NPM/Node}
+\section{Commandes}
+\begin{itemize}
+\item Initialisation d'un projet\\
+La commande \textit{init} permet de créer un projet .json vide
+\item Installation d'un module\\
+Dans un projet existant, on peut rajouter un module et en même temps la dépendance:
+\begin{minted}[bgcolor=bg]{shell}
+npm install "module" -D
+\end{minted}
+\item Ajouter automatiquement ce module en dépendance de développement
+\begin{minted}[bgcolor=bg]{shell}
+npm install "module" -D
+\end{minted}
+\item Ajouter automatiquement ce module en dépendance de livraison
+\begin{minted}[bgcolor=bg]{shell}
+npm install "module" --save
+\end{minted}
+\item Lancer un script\\
+Dans la liste des scripts du fichier .json, il peut être possible d'en lancer un:
+\begin{minted}[bgcolor=bg]{shell}
+npm run es6
+\end{minted}
+Dans cet exemple:
+\begin{minted}[bgcolor=bg]{shell}
+"scripts": {
+    "es6": "./node_modules/.bin/http-server -c-1 ."
+  }
+\end{minted}
+\item Débogage dans Chrome\\
+On peut lancer un debogage d'un fichier JS depuis Node. Celui-ci lance un browker permettant par la suite de deboguer depuis les devtools de Chrome gràce au lien renvoyé par cette commande:
+\begin{minted}[bgcolor=bg]{shell}
+node --debug-brk=35220 --inspect samples\learning-types.js
+\end{minted}
+\end{itemize}
+
+
+\backmatter 
+
+\printindex 
+
+\end{document} 
