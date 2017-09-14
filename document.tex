@@ -29,43 +29,117 @@
 %\includegraphics{util_inherits.png}
 
 %%%%%%%%%%%%%%NPM/Node
-\chapter{NPM/Node}
-\section{Commandes}
+\chapter{Débuts}
+\section{Installation}
+Utilisation de NPM pour cela.
 \begin{itemize}
-\item Initialisation d'un projet\\
-La commande \textit{init} permet de créer un projet .json vide
-\item Installation d'un module\\
-Dans un projet existant, on peut rajouter un module et en même temps la dépendance:
-\begin{minted}[bgcolor=bg]{shell}
-npm install "module" -D
+\item Initialisation du projet
+\begin{minted}[bgcolor=bg]{javascript}
+npm init
 \end{minted}
-\item Ajouter automatiquement ce module en dépendance de développement
+Le fichier package.json ressemble à ça:
 \begin{minted}[bgcolor=bg]{shell}
-npm install "module" -D
-\end{minted}
-\item Ajouter automatiquement ce module en dépendance de livraison
-\begin{minted}[bgcolor=bg]{shell}
-npm install "module" --save
-\end{minted}
-\item Lancer un script\\
-Dans la liste des scripts du fichier .json, il peut être possible d'en lancer un:
-\begin{minted}[bgcolor=bg]{shell}
-npm run es6
-\end{minted}
-Dans cet exemple:
-\begin{minted}[bgcolor=bg]{shell}
-"scripts": {
-    "es6": "./node_modules/.bin/http-server -c-1 ."
+{
+  "name": "videoinfo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^1.7.6"
   }
+}
 \end{minted}
-\item Débogage dans Chrome\\
-On peut lancer un debogage d'un fichier JS depuis Node. Celui-ci lance un browker permettant par la suite de deboguer depuis les devtools de Chrome gràce au lien renvoyé par cette commande:
+\item Ajout d'Electron\\
+Dans ce projet vide, on ajoute la dépendance Elctron
 \begin{minted}[bgcolor=bg]{shell}
-node --debug-brk=35220 --inspect samples\learning-types.js
+npm install electron --save
 \end{minted}
+
 \end{itemize}
+Et voilà, c'est intallé.
 
+\section{Premiers pas}
+Les scripts commencent par l'inclusion d'electron:
+\begin{minted}[bgcolor=bg]{javascript}
+const electron = require('electron');
+\end{minted}
+On récupère l'objet \textit{app} de l'application electron qui vient d'être récupérée:
+\begin{minted}[bgcolor=bg]{javascript}
+const {app} = electron;
+\end{minted}
 
+\begin{minted}[bgcolor=bg]{javascript}
+app.on('ready', ()=> {
+    console.log('Hello world!!');
+});
+\end{minted}
+Afin de pouvoir être exécuté, il faut pour cela indiquer comment il faut faire dans package.json dans la balise \textit{scripts}.
+\begin{minted}[bgcolor=bg]{javascript}
+"scripts": {
+    "electron":"electron ."
+  },
+\end{minted}
+Maintenant pour lancer l'application:
+\begin{minted}[bgcolor=bg]{shell}
+npm run electron
+\end{minted}
+Aucune fenêtre n'apparaît, mais dans les log on peut voir "Hello world" comme demandé dans le code. 
+Pour afficher une fenêtre, il faut utilier l'objet \textit{BrowserWindows}
+\begin{minted}[bgcolor=bg]{javascript}
+//ajout de borwserWindow en définition
+const {app, BrowserWindow} = electron;
+app.on('ready', ()=> {
+    new BrowserWindow({});
+});
+\end{minted}
+Avec un objet vide en paramètre, il permet d'ouvrir une fenêtre vide, sans aucun affichage et avec un menu simple.
+
+Pour avoir maintenant une page Web dans notre fenêtre, il faut maintenant créer un fichier .html
+\begin{listing}[ht]
+\begin{minted}[bgcolor=bg]{html}
+<html>
+<head>
+</head>
+<body>
+    <h1>Titre</h1>
+    <p>Pour l'instant une fenêtre vide.</p>
+</body>
+</html>
+\end{minted}
+\caption{fichier index.html}
+\label{listing:0}
+\end{listing}
+Ensuite l'ouverture de ce fichier se fait comme suit:
+\begin{minted}[bgcolor=bg]{javascript}
+app.on('ready', ()=> {
+    const mainWindow = new BrowserWindow({});
+    mainWindow.loadURL(`file://${__dirname}/index.html`);
+});
+\end{minted}
+A partir de cet instant, il n'est plus nécessaire de relancer l'application \textit{electron} pour voir un changement dans le fichier \textit{index.html} apparaître dans la fenêtre. Il suffit de recharger la page depuis le menu de la fenêtre.
+
+\chapter{Annexes}
+\section{Truc et astuces}
+\subsection{Rafraîchir la page}
+A partir du moment où une page apparaît dans la fenêtre, si une modification survient et que celle-ci n'a aucun lien avec la partie Javscript du côté electron, alors il n'est pas nécessaire de relancer electron.
+
+En effet, il s'agit d'une page purement HTML avec son propre code Javascript, elle peut être rafraîchie/rechargée sans qu'il n'y ait d'impact avec le code NodeJS. \textbf{En revanche}, il peut y avoir des impacts en cas d'appel de formulaire ou de perte de données stockées temporairement en mémoire.
+\subsection{Débuggage d'un événement}
+On peut forcer directement depuis le code javascript un arrêt par le debugger. Si on est dans une fonction, ou un événement et que l'on souhaite s'arrêter dedans sans avoir à replacer le berakpoint depuis l'interface de debuggage, on ajoute une commande directement dans le code.
+\begin{minted}[bgcolor=bg]{javascript}
+document.querySelector('form').addEventListener('submit', 
+    (event)=>{
+        //pour pas que le formulaire se soumette tout seul
+      event.preventDefault();  
+      debugger      //<------- ICI
+    })
+\end{minted}
+Pour que l'arrêt se produise, il faut activer le mode debuggage de la fenêtre. Dans le cas contraire, il ne va rien se produire.
 \backmatter 
 
 \printindex 
