@@ -11,6 +11,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{xcolor}
+\usepackage{caption} 
 \definecolor{bg}{rgb}{0.95,0.95,0.95}
 \definecolor{bg_js}{rgb}{0.95,0.55,0.55}
 \newminted{typescript}{javascript,bgcolor=bg}
@@ -63,6 +64,8 @@ npm install electron --save
 \end{itemize}
 Et voilà, c'est intallé.
 
+%%%%%%%%%%%%%%%
+%%%% Premiers pas
 \section{Premiers pas}
 Les scripts commencent par l'inclusion d'electron:
 \begin{minted}[bgcolor=bg]{javascript}
@@ -122,6 +125,49 @@ app.on('ready', ()=> {
 });
 \end{minted}
 A partir de cet instant, il n'est plus nécessaire de relancer l'application \textit{electron} pour voir un changement dans le fichier \textit{index.html} apparaître dans la fenêtre. Il suffit de recharger la page depuis le menu de la fenêtre.
+
+\chapter{IPC}
+Inter process communication permet de dialoguer entre la fenêtre HTML et NodeJS (electron). Cela se fait par le biai d'événement.
+\section{Principe}
+Electron a mis en place au sein du navigateur Chromium intégré des fonction permettant des communication IPC. Elles sont accéssible depuis une page HTML, mais pour pouvoir y accéder il faut préalablement utiliser la fonction \textit{require} comme dans un script NodeJS.
+
+Il peut sembler étranger qu'une fonction require puisse exister directement dans la page HTML car normalement elle n'existe pas.
+
+\begin{center}
+\includegraphics[width=\textwidth]{./img/chrome_require_fail.jpg}
+\captionof{figure}{Fonction \textit{require} inconnue dans Chromium}
+\label{fig1}
+\end{center}
+
+Si on effectue la même commande dans le console de la fenêtre d'electron (une fois activé les outils de débuggage), on remarque cette fois que la fonction existe:
+
+\begin{center}
+\includegraphics[width=\textwidth]{./img/chrome_require_ok.jpg}
+\captionof{figure}{Fonction \textit{require} connue dans Electron}
+\label{fig1}
+\end{center}
+
+Cela est dû au fait que dans Electron, la fenêtre qui apparaît contient déjà un ensemble de fonctionnalités que ne possède pas un navigateur classique.
+
+\begin{center}
+\includegraphics[width=\textwidth]{./img/electron_ajout.jpg}
+\captionof{figure}{La fenêtre (MainWindow) est un condensé de fonctionnalités héritées de NodeJS avec le fonctionnement standard d'une page Web}
+\label{fig1}
+\end{center}
+
+Cela permet d'accéder directement depuis la page Electron a des fonction IPC, et même aux fonctionnalités d'accès aux fichier:
+\begin{minted}[bgcolor=bg]{javascript}
+const fs = require('fs'); //<---- ceci fonctionne nativement
+\end{minted}
+
+\section{Exemple simple}
+
+
+
+
+
+%%%%%%%%%%%%%%%
+%%%%%%%%%ANNXES
 
 \chapter{Annexes}
 \section{Truc et astuces}
