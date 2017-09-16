@@ -160,12 +160,50 @@ Cela permet d'accéder directement depuis la page Electron a des fonction IPC, e
 const fs = require('fs'); //<---- ceci fonctionne nativement
 \end{minted}
 
+Dans les grandes lignes, un événement depuis la fenêtre HTML (\textit{ipcRenderer.send}) est envoyé vers la partie NodeJS  (\textit{ipcMain.on}). En réponse, la partie NodeJS lui envoie un événement de retour (\textit{mainWindow.webContents.send}) pour qu'il la reçoive (\textit{ipcRenderer.on}).
+\begin{center}
+\includegraphics[width=\textwidth]{./img/ipc_principe.jpg}
+\captionof{figure}{ipcRenderer crée l'événement, ipcMain reçoit. Mais c'est mainWindow qui répond à ipcRenderer.}
+\label{fig1}
+\end{center}
+
 \section{Exemple simple}
+Afin d'accéder aux fonctions d'envoie de message, il est nécessaire d'ajouter une dépendance dans le fichier HMTL:
+\begin{minted}[bgcolor=bg]{javascript}
+const electron = require('electron');
+const {ipcRenderer} = electron;
+\end{minted}
+\textit{ipcRenderer} va servir à envoyer ces messages.\\
+Cela se fait tout simplement avec la méthode \textit{send}. En effet, \textit{ipcRenderer} hérite de \textit{EventEmmiter}.
+\begin{minted}[bgcolor=bg]{javascript}
+ipcRenderer.send('video:submit', path);
+\end{minted}
+Le premier paramètre est le nom de l'événement. Il est formatter de manière à comprendre rapidement en le voyant le nom, le but, l'appelant...\\
+Du côté NodeJS, le traitement est aussi simple.\\
+Il faut d'abord ajouter \textit{ipcMain} dans la dépendance:
+\begin{minted}[bgcolor=bg]{javascript}
+const {/*... autres dépendances..*/, ipcMain} = electron;
+\end{minted}
 
-
-
-
-
+Puis la partie de code qui va traiter l'événement une fois qu'il l'aura reçu.
+\begin{minted}[bgcolor=bg]{javascript}
+ipcMain.on('video:submit', (event, data) => {
+    //partie du code traité au moment de la réception de l'événement
+    console.log("oui c'est bon: "+metadata.format.duration);
+})
+\end{minted}
+Pour faire la réponse du côté NodeJS, c'est à \textit{mainWindow.webContents.send} de le faire.
+\begin{minted}[bgcolor=bg]{javascript}
+mainWindow.webContents.send('video:response', metadata.format.duration);
+\end{minted}
+Et du côté de la page HTML, c'est de \textit{ipcMain.on} d'agir.
+\begin{minted}[bgcolor=bg]{javascript}
+ipcRenderer.on('video:response', (event, data)=>{
+        console.log("Taille: "+ data);
+        document.querySelector("#result").innerHTML = "Résultat: "+data;
+    })
+\end{minted}
+On voit dans un premier temps l'envoie d'un message \textit{video:response} dans une emission \textit{send}. Et dans un second temps, la réception de ce message \textit{on}.
 %%%%%%%%%%%%%%%
 %%%%%%%%%ANNXES
 
